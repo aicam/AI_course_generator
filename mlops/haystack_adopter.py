@@ -4,12 +4,15 @@ from . import TEMP_PROCESSED_PATH
 from haystack.utils import convert_files_to_docs
 from haystack.nodes import PreProcessor
 from haystack.document_stores import OpenSearchDocumentStore
-from haystack.nodes import EmbeddingRetriever, PromptNode, PromptTemplate, AnswerParser
+from haystack.nodes import EmbeddingRetriever, PromptNode
 
-MDDEL = "gpt-3.5-turbo"
+MDDEL = "gpt-4-1106-preview"
 class HaystackAdopter:
+    '''
+    This class provide functionalities using Haystack library to other methods.
+    '''
 
-    def __init__(self, os_endpoint, os_username, os_password, os_port, openai_api_key, preprocessed_dir):
+    def __init__(self, os_endpoint: str, os_username: str, os_password: str, os_port: str, openai_api_key: str, preprocessed_dir: str):
         self.os_endpoint = os_endpoint
         self.os_username = os_username
         self.os_password = os_password
@@ -17,7 +20,12 @@ class HaystackAdopter:
         self.openai_api_key = openai_api_key
         self.preprocessed_dir = preprocessed_dir
 
-    def get_document_store(self, index_name):
+    def get_document_store(self, index_name: str) -> OpenSearchDocumentStore:
+        '''
+        Connect to OpenSearch and create a document store
+        :param index_name: index name in which data is stored or want to be stored
+        :return: A Haystack document store object
+        '''
         return OpenSearchDocumentStore(
             host=self.os_endpoint,
             port=self.os_port,
@@ -27,7 +35,13 @@ class HaystackAdopter:
             embedding_dim=1536,
             index=index_name)
 
-    def get_retriever(self, document_store):
+    def get_retriever(self, document_store: OpenSearchDocumentStore) -> EmbeddingRetriever:
+        '''
+        Create a retriever based on an embedding model and connect it to a document store
+        to update document store or retriever from document store using embedding similarity
+        :param document_store: OpenSearched document store instance
+        :return: An embedding retriever attached to OpenSearch document store
+        '''
         return EmbeddingRetriever(
             document_store=document_store,
             batch_size=128,
@@ -36,11 +50,14 @@ class HaystackAdopter:
             max_seq_len=1024
         )
 
-    def delete_doc(self, index_name, doc_name):
-        document_store = self.get_document_store(index_name)
-        document_store.delete_documents(filters={"name": doc_name})
-
-    def process_dir(self, index_name):
+    def process_dir(self, index_name: str) -> None:
+        '''
+        Haystack can aoutomatically parse files inside a folder. This method
+        - convert all txt files in a doc into arrays of sentences
+        - store them in OpenSearch document store
+        - update the document store and replace strings with embeddings
+        :param index_name: index name of OpenSearch
+        '''
         docs = convert_files_to_docs(TEMP_PROCESSED_PATH, split_paragraphs=True)
         preprocessor = PreProcessor(
             clean_empty_lines=True,
@@ -58,6 +75,9 @@ class HaystackAdopter:
         document_store.update_embeddings(retriever=retriever)
 
     def get_prompt_node(self):
+        '''
+        :return: creates a generic prompt node which is in fact an API call to ChatGPT
+        '''
         return PromptNode(MDDEL, api_key=self.openai_api_key)
 
 

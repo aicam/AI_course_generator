@@ -24,8 +24,10 @@ class HaystackTemplateProcessor:
         if only_context:
             return "", context
         prompt = f'''
-                    Synthesize an answer from the context provided below. {WARNING_COMMAND}.
-                    {component.prompt}. 
+                    Synthesize a response to the prompt based on the context provided below. {WARNING_COMMAND}.
+                    \n\n
+                    Prompt: {component.prompt}
+                    \n 
                     Context: {context}
                 '''
         prompt_node = haystack_adopter.get_prompt_node()
@@ -33,17 +35,23 @@ class HaystackTemplateProcessor:
         return answer, context
 
     def __get_default_transcript(self, answer: str, context: str, max_words: Union[int] = 50) -> str:
+        '''
+        Each component has a transcript as a text to convert to voice and play in the slide. This function
+        creates a default transcript based on the context that is retrieved from OpenSearch.
+        :param answer: answer from prompt node
+        :param context: context retrieved from OpenSearch and embedding retriever
+        :param max_words: maximum number of words in the speech
+        :return: speech text
+        '''
         prompt_node = haystack_adopter.get_prompt_node()
         prompt = f'''
-            You are a teacher for a course. {WARNING_COMMAND}. Write like a speaker, do not point at the paragraph. You have been asked to talk less than {max_words} words about a paragraph with respect to the context.
-            In the following, you see a paragraph and a context, you should talk about the paragraph and get help from the context.
+            You are a teacher for a course. {WARNING_COMMAND}. Write like a speaker. You have been asked to talk less than {max_words} words about the context mentioned below.
             \n\n
-            Context: {context}
-            \n\n
-            Paragraph: {answer}
+            Context: {answer} \n {context}
         '''
         return prompt_node(prompt)[0]
 
+    ### functions that operate based on component_name in the template ###
     def get_title_component_result(self, component: ComponentAttributes) -> ComponentOutput:
         answer, context = self.__get_component_default_result(component)
         transcript = self.__get_default_transcript(answer, context)
@@ -68,7 +76,12 @@ class HaystackTemplateProcessor:
         params = answer.split(component.delimiter)
         return ComponentOutput(answer, transcript, params)
 
+    ### functions that operate based on component_name in the template ###
+
     def __run_component_no_params(self, component: ComponentAttributes) -> ComponentOutput:
+        '''
+        Maps component_name in template to its function in the class
+        '''
         if component.component_name == 'title':
             return self.get_title_component_result(component)
         elif component.component_name == 'shortdescription':
@@ -154,6 +167,7 @@ class HaystackTemplateProcessor:
                     "params": component_output.params
                 }
 
+        haystack_adopter
         return template
 
 

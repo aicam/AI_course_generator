@@ -6,7 +6,7 @@
     {
       "header": {
         "component_name": "title",
-        "prompt": "A very short title less than 10 words describing the topic of the document. The short title does not need to be a full sentence but rather full of informative words.",
+        "prompt": "A very short title less than 10 words describing the topic of the context. The short title does not need to be a full sentence but rather full of informative words.",
         "params": [],
         "rag_query": "important information",
         "delimiter": ""
@@ -14,7 +14,7 @@
       "body": [
         {
           "component_name": "shortdescription",
-          "prompt": "A short description less than 50 words explaining the whole idea of the document. The short description should highlight keywords and concepts explained in the document.",
+          "prompt": "A short description less than 50 words explaining the whole idea of the context. The short description should highlight keywords and concepts mentioned in the context.",
           "params": [],
           "rag_query": "important information",
           "delimiter": ""
@@ -39,7 +39,7 @@
       "body": [
         {
           "component_name": "shortdescription",
-          "prompt": "You are writing a short description about the chapter '%chapter-name%' in the document which you see the images. First, find pages related to the chapter and focus only on these pages. Second, find keywords and important information mentioned in the focused pages about the chapter '%chapter-name%'. And finally, write a short description less than 100 words with all those keywords.",
+          "prompt": "You are writing a short description less than 50 words about the chapter '%chapter-name%'. First, find information related to the chapter and focus only on those. Second, find keywords and important information mentioned in the focused information about the chapter '%chapter-name%'. And finally, write a short description less than 50 words with all those keywords.",
           "rag_query": "%chapter-name%",
           "params": [{"chapter-name": "slide_0_body_1_0"}],
           "delimiter": ""

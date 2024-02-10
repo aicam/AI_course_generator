@@ -16,6 +16,11 @@ def JsonResponse(obj):
     return JsonResponseSuper(obj,encoder=JsonEncoder)
 
 def query_rag(request: HttpRequest) -> JsonResponse:
+    '''
+    Path to run RAG over document and generate course
+    :param request: file in PDF format
+    :return: template + output of each component
+    '''
     try:
         # file_processor.process_files(request.FILES)
         template = read_template("basic")
