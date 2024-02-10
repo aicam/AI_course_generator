@@ -50,10 +50,12 @@ class HaystackTemplateProcessor:
         return ComponentOutput(answer, transcript, [])
 
     def get_title_fixed_component_result(self, component: ComponentAttributes) -> ComponentOutput:
+        print("in fixed ", component)
         answer = component.params[0]['title']
         _, context = self.__get_component_default_result(component, True)
         transcript = self.__get_default_transcript(answer, context)
-        return ComponentOutput(answer, transcript)
+        print("in fixed finished")
+        return ComponentOutput(answer, transcript, [])
 
     def get_shortdescription_component_result(self, component: ComponentAttributes) -> ComponentOutput:
         answer, context = self.__get_component_default_result(component)
@@ -100,8 +102,10 @@ class HaystackTemplateProcessor:
 
     def __fill_params(self, template: dict, slide_num: int) -> dict:
         header_params = template['slides'][slide_num]['header'].params
+        print(f"filling params slide {slide_num} start")
         if len(header_params) > 0:
             params_parsed = self.__get_component_params_val(template, header_params)
+            print("header params parsed ", params_parsed)
             prompt = template['slides'][slide_num]['header'].prompt
             rag_query = template['slides'][slide_num]['header'].rag_query
             for param in params_parsed:
@@ -110,11 +114,13 @@ class HaystackTemplateProcessor:
                 rag_query = rag_query.replace(f"%{param['var']}%", param['val'])
             template['slides'][slide_num]['header'].prompt = prompt
             template['slides'][slide_num]['header'].rag_query = rag_query
-            template['slides'][slide_num]['header'].params = {p['var']: p['val'] for p in params_parsed}
+            template['slides'][slide_num]['header'].params = [{p['var']: p['val']} for p in params_parsed]
 
         for (i, slide) in enumerate(template['slides'][slide_num]['body']):
             if len(slide.params) > 0:
+                print(f"slide {slide_num} body {i}")
                 params_parsed = self.__get_component_params_val(template, slide.params)
+                print("params parsed ", params_parsed)
                 prompt = template['slides'][slide_num]['body'][i].prompt
                 rag_query = template['slides'][slide_num]['body'][i].rag_query
                 for param in params_parsed:
@@ -123,7 +129,9 @@ class HaystackTemplateProcessor:
                     rag_query = rag_query.replace(f"%{param['var']}%", param['val'])
                 template['slides'][slide_num]['body'][i].prompt = prompt
                 template['slides'][slide_num]['body'][i].rag_query = rag_query
-                template['slides'][slide_num]['body'][i].params = {p['var']: p['val'] for p in params_parsed}
+                template['slides'][slide_num]['body'][i].params = [{p['var']: p['val']} for p in params_parsed]
+
+        print("fill params done")
 
         return template
 

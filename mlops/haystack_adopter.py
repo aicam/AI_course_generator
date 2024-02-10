@@ -6,7 +6,7 @@ from haystack.nodes import PreProcessor
 from haystack.document_stores import OpenSearchDocumentStore
 from haystack.nodes import EmbeddingRetriever, PromptNode, PromptTemplate, AnswerParser
 
-MDDEL = "gpt-4-1106-preview"
+MDDEL = "gpt-3.5-turbo"
 class HaystackAdopter:
 
     def __init__(self, os_endpoint, os_username, os_password, os_port, openai_api_key, preprocessed_dir):

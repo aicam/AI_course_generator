@@ -16,6 +16,24 @@ class ComponentAttributes:
     delimiter: str
     output: dict
 
+    def toJSON(self):
+        """Returns a dictionary representation of the object attributes.
+
+        This method converts the attributes of the `ComponentAttributes`
+        instance to a dictionary, ensuring JSON serializability.
+
+        Returns:
+            dict: A dictionary containing the instance's attributes.
+        """
+
+        return {
+            'component_name': self.component_name,
+            'prompt': self.prompt,
+            'params': self.params,
+            'rag_query': self.rag_query,
+            'delimiter': self.delimiter,
+            'output': self.output,
+        }
 @dataclass
 class ComponentOutput:
     answer: str
