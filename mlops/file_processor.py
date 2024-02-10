@@ -69,12 +69,12 @@ class FileProcessor:
             file_txt_path = self.tmp_processed_path + f"/{name_txt}"
             self.write_file_in_tmp(files[filename], file_path)
 
-            self.pdf_to_txt(file_path, file_txt_path)
+            # self.pdf_to_txt(file_path, file_txt_path)
 
         haystack_adopter.process_dir("test")
 
-        shutil.rmtree(self.tmp_path, ignore_errors=True)
-        shutil.rmtree(self.tmp_processed_path, ignore_errors=True)
+        # shutil.rmtree(self.tmp_path, ignore_errors=True)
+        # shutil.rmtree(self.tmp_processed_path, ignore_errors=True)
 
 
 file_processor = FileProcessor()

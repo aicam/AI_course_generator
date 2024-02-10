@@ -21,7 +21,7 @@
         },
         {
           "component_name": "bulletpoints",
-          "prompt": "Read the whole document and divide the whole knowledge explained in the document into 5 chapters and find a name less than 20 words for each chapter. Separate each chapter name by \n. Only write chapter names.",
+          "prompt": "Read the whole context and divide the whole knowledge explained in the context into 5 chapters separated by \n and find a name less than 20 words for each chapter. Separate each chapter name by \n. Only write chapter names with \n.",
           "params": [],
           "rag_query": "Titles of the topics",
           "delimiter": "\n"
@@ -32,7 +32,8 @@
       "header": {
         "component_name": "title-fixed",
         "prompt": "",
-        "params": ["title-text"],
+        "params": [{"title": "slide_0_body_1_0"}],
+        "rag_query": "%title%",
         "delimiter": ""
       },
       "body": [
@@ -40,7 +41,7 @@
           "component_name": "shortdescription",
           "prompt": "You are writing a short description about the chapter '%chapter-name%' in the document which you see the images. First, find pages related to the chapter and focus only on these pages. Second, find keywords and important information mentioned in the focused pages about the chapter '%chapter-name%'. And finally, write a short description less than 100 words with all those keywords.",
           "rag_query": "%chapter-name%",
-          "params": ["chapter-name"],
+          "params": [{"chapter-name": "slide_0_body_1_0"}],
           "delimiter": ""
         }
       ]
