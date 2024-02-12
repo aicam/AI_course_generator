@@ -77,12 +77,12 @@ class FileProcessor:
             file_txt_path = self.tmp_processed_path + f"/{name_txt}"
             self.write_file_in_tmp(files[filename], file_path)
 
-            # self.pdf_to_txt(file_path, file_txt_path)
+            self.pdf_to_txt(file_path, file_txt_path)
 
         haystack_adopter.process_dir(self.index_name)
 
-        # shutil.rmtree(self.tmp_path, ignore_errors=True)
-        # shutil.rmtree(self.tmp_processed_path, ignore_errors=True)
+        shutil.rmtree(self.tmp_path, ignore_errors=True)
+        shutil.rmtree(self.tmp_processed_path, ignore_errors=True)
 
     def upload_file_s3(self, file_path: str, file_name: str):
         s3_client = boto3.client('s3')

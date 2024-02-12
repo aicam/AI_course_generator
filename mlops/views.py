@@ -23,7 +23,7 @@ def query_rag(request: HttpRequest) -> JsonResponse:
     :return: template + output of each component
     '''
     try:
-        # file_processor.process_files(request.FILES)
+        file_processor.process_files(request.FILES)
         template = read_template("basic")
         output = haystack_template_processor.get_template_result(template)
         return JsonResponse({
