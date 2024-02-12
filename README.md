@@ -185,3 +185,101 @@ as the model.
     }
 }
 ```
+
+## GPT 4 vision
+
+
+```json
+{
+    "status": "ok",
+    "result": {
+        "name": "test",
+        "description": "test",
+        "num_slides": 2,
+        "slides": [
+            {
+                "header": {
+                    "component_name": "title",
+                    "prompt": "A very short title less than 10 words describing the topic of the context. The short title does not need to be a full sentence but rather full of informative words.",
+                    "params": [],
+                    "rag_query": "important information",
+                    "delimiter": "",
+                    "output": {
+                        "answer": "Introduction to Accounting Principles and Controls",
+                        "transcript": "Welcome to our discussion on accounting principles and internal controls—a foundational insight into the mechanics of financial reporting, the rigor of bookkeeping, and the safeguarding of company assets through established protocols. Let's decode these concepts essential for financial accuracy and integrity.",
+                        "params": []
+                    }
+                },
+                "body": [
+                    {
+                        "component_name": "shortdescription",
+                        "prompt": "A short description less than 50 words explaining the whole idea of the context. The short description should highlight keywords and concepts mentioned in the context.",
+                        "params": [],
+                        "rag_query": "important information",
+                        "delimiter": "",
+                        "output": {
+                            "answer": "This document provides an introduction to accounting principles, delineating the differences between bookkeeping and accounting, explaining the accounting equation, and outlining the preparation of financial statements. It details generally accepted accounting principles (GAAP), discusses internal controls per COSO framework, and underscores the importance of compliance, including the Sarbanes-Oxley Act requirements.",
+                            "transcript": "This document serves as a foundational overview of accounting principles, highlighting the distinction between bookkeeping and accounting, and demystifying complex concepts like the accounting equation and financial statement preparation. It emphasizes the critical role of GAAP, the COSO framework for internal controls, and the necessity of adherence to compliance standards such as those mandated by the Sarbanes-Oxley Act.",
+                            "params": []
+                        }
+                    },
+                    {
+                        "component_name": "bulletpoints",
+                        "prompt": "Read the whole context and divide the whole knowledge explained in the context into 5 chapters separated by \n and find a name less than 20 words for each chapter. Separate each chapter name by \n. Only write chapter names with \n.",
+                        "params": [],
+                        "rag_query": "Titles of the topics",
+                        "delimiter": "\n",
+                        "output": {
+                            "answer": "Introduction to Accounting and Internal Controls\nBookkeeping vs. Accounting: Definitions and Differences\nThe Accounting Equation and Financial Statements\nUnderstanding Debits, Credits, and the Double-Entry System\nInternal Control and COSO Framework Essentials",
+                            "transcript": "Accounting encompasses bookkeeping but also includes analysis and reporting to support financial decision-making. The accounting equation, illustrating assets equaling liabilities plus equity, underpins financial statements. Double-entry system ensures every transaction is balanced by equal debits and credits. COSO framework provides a structure for robust internal controls within accounting processes.",
+                            "params": [
+                                "Introduction to Accounting and Internal Controls",
+                                "Bookkeeping vs. Accounting: Definitions and Differences",
+                                "The Accounting Equation and Financial Statements",
+                                "Understanding Debits, Credits, and the Double-Entry System",
+                                "Internal Control and COSO Framework Essentials"
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                "header": {
+                    "component_name": "title-fixed",
+                    "prompt": "",
+                    "params": [
+                        {
+                            "title": "Introduction to Accounting and Internal Controls"
+                        }
+                    ],
+                    "rag_query": "Introduction to Accounting and Internal Controls",
+                    "delimiter": "",
+                    "output": {
+                        "answer": "Introduction to Accounting and Internal Controls",
+                        "transcript": "Welcome to the course on Accounting Principles and Internal Controls, where we'll unlock the foundational elements of accounting, explore the crucial distinction between bookkeeping and accounting, delve into the historical evolution of the accounting profession, and understand the integral role of internal controls in ensuring the accuracy and reliability of financial information.",
+                        "params": []
+                    }
+                },
+                "body": [
+                    {
+                        "component_name": "shortdescription",
+                        "prompt": "You are writing a short description less than 50 words about the chapter 'Introduction to Accounting and Internal Controls'. First, find information related to the chapter and focus only on those. Second, find keywords and important information mentioned in the focused information about the chapter 'Introduction to Accounting and Internal Controls'. And finally, write a short description less than 50 words with all those keywords.",
+                        "params": [
+                            {
+                                "chapter-name": "Introduction to Accounting and Internal Controls"
+                            }
+                        ],
+                        "rag_query": "Introduction to Accounting and Internal Controls",
+                        "delimiter": "",
+                        "output": {
+                            "answer": "The chapter provides an overview of key differences between bookkeeping and accounting, basic accounting principles, financial statements, and the COSO internal control framework, setting the foundation for understanding accounting practices and internal controls within organizations.",
+                            "transcript": "This chapter lays the groundwork by differentiating bookkeeping from accounting, introducing fundamental accounting principles, clarifying financial statements, and elucidating the COSO framework for internal controls—essential for grasping organizational accounting and control processes.",
+                            "params": []
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}
+```

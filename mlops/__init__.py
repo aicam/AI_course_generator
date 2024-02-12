@@ -6,11 +6,12 @@ from typing import List
 TEMP_PATH = 'mlops/tmp/'
 TEMP_PROCESSED_PATH = 'mlops/tmp_processed/'
 DELIMITER = '+++'
+WARNING_COMMAND = "Only write the answer."
 
 @dataclass
 class ComponentAttributes:
     component_name: str
-    prompt: List[str]
+    prompt: str
     params: List[dict]
     rag_query: str
     delimiter: str

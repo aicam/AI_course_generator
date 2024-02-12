@@ -1,93 +1,116 @@
+import os
 from typing import List, Union
+from openai import OpenAI
 import re
 
-from .haystack_adopter import haystack_adopter
 from . import ComponentOutput, ComponentAttributes, WARNING_COMMAND
 
-TOP_K = 2
+MODEL = "gpt-4-vision-preview"
+class GPT4VisionTemplateProcessor:
 
-class HaystackTemplateProcessor:
+    def __init__(self, openai_api_key: str):
+        self.client = OpenAI(
+                api_key = openai_api_key
+            )
 
-    def __get_component_default_result(self, component: ComponentAttributes, only_context: Union[bool] = False) -> (str, str):
+    def __call_gpt(self, content: List[dict], max_token: Union[int] = 300) -> str:
+        response = self.client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {
+                    "role": "user",
+                    "content": content,
+                }
+            ],
+            max_tokens=max_token,
+        )
+
+        return response.choices[0].message.content
+
+    def __get_component_default_result(self, component: ComponentAttributes, urls: List[str]) -> str:
         '''
         If a component does not have parameters or specific requirements, this function
-        runs a default retrieving and answering which matches many components.
+        runs a default api call and answering which matches many components.
         :param component: any component
-        :return: answer of the component and the context which RAG has found
+        :return: answer of the component
         '''
-        document_store = haystack_adopter.get_document_store("test")
-        retriever = haystack_adopter.get_retriever(document_store)
-        context_doc = retriever.retrieve(component.rag_query, top_k=TOP_K)
-        context = '\n'.join([x.content for x in context_doc])
-        if only_context:
-            return "", context
-        prompt = f'''
-                    Synthesize a response to the prompt based on the context provided below. {WARNING_COMMAND}.
-                    \n\n
-                    Prompt: {component.prompt}
-                    \n 
-                    Context: {context}
-                '''
-        prompt_node = haystack_adopter.get_prompt_node()
-        answer = prompt_node(prompt)[0]
-        return answer, context
+        print("url in answer ", urls[0])
+        content = [{
+            "type": "image_url",
+            "image_url": {
+                "url": url
+            }
+        } for url in urls]
+        content.append({
+            "type": "text",
+            "text": component.prompt
+        })
 
-    def __get_default_transcript(self, answer: str, context: str, max_words: Union[int] = 50) -> str:
+        return self.__call_gpt(content)
+
+    def __get_default_transcript(self, answer: str, urls: List[str], max_words: Union[int] = 50) -> str:
         '''
         Each component has a transcript as a text to convert to voice and play in the slide. This function
-        creates a default transcript based on the context that is retrieved from OpenSearch.
-        :param answer: answer from prompt node
-        :param context: context retrieved from OpenSearch and embedding retriever
+        creates a default transcript based on the answer and document.
+        :param answer: answer from chatgpt
         :param max_words: maximum number of words in the speech
         :return: speech text
         '''
-        prompt_node = haystack_adopter.get_prompt_node()
-        prompt = f'''
-            You are a teacher for a course. {WARNING_COMMAND}. Write like a speaker. You have been asked to talk less than {max_words} words about the context mentioned below.
+        print("url in transcript ", urls[0])
+
+        content = [{
+            "type": "image_url",
+            "image_url": {
+                "url": url
+            }
+        } for url in urls]
+        content.append({
+            "type": "text",
+            "text": f'''
+            You are a teacher for a course. {WARNING_COMMAND}. Write like a speaker. You have been asked to talk less than {max_words} words about the context mentioned below based on the document.
             \n\n
-            Context: {answer} \n {context}
+            Context: {answer}
         '''
-        return prompt_node(prompt)[0]
+        })
+
+        return self.__call_gpt(content)
 
     ### functions that operate based on component_name in the template ###
-    def get_title_component_result(self, component: ComponentAttributes) -> ComponentOutput:
-        answer, context = self.__get_component_default_result(component)
-        transcript = self.__get_default_transcript(answer, context)
+    def get_title_component_result(self, component: ComponentAttributes, urls: List[str]) -> ComponentOutput:
+        answer = self.__get_component_default_result(component, urls)
+        transcript = self.__get_default_transcript(answer, urls)
         return ComponentOutput(answer, transcript, [])
 
-    def get_title_fixed_component_result(self, component: ComponentAttributes) -> ComponentOutput:
-        print("in fixed ", component)
+    def get_title_fixed_component_result(self, component: ComponentAttributes, urls: List[str]) -> ComponentOutput:
         answer = component.params[0]['title']
-        _, context = self.__get_component_default_result(component, True)
-        transcript = self.__get_default_transcript(answer, context)
-        print("in fixed finished")
+        transcript = self.__get_default_transcript(answer, urls)
         return ComponentOutput(answer, transcript, [])
 
-    def get_shortdescription_component_result(self, component: ComponentAttributes) -> ComponentOutput:
-        answer, context = self.__get_component_default_result(component)
-        transcript = self.__get_default_transcript(answer, context)
+    def get_shortdescription_component_result(self, component: ComponentAttributes, urls: List[str]) -> ComponentOutput:
+        answer = self.__get_component_default_result(component, urls)
+        transcript = self.__get_default_transcript(answer, urls)
         return ComponentOutput(answer, transcript, [])
 
-    def get_bulletpoint_component_result(self, component: ComponentAttributes) -> ComponentOutput:
-        answer, context = self.__get_component_default_result(component)
-        transcript = self.__get_default_transcript(answer, context)
+    def get_bulletpoint_component_result(self, component: ComponentAttributes, urls: List[str]) -> ComponentOutput:
+        answer = self.__get_component_default_result(component, urls)
+        transcript = self.__get_default_transcript(answer, urls)
         params = answer.split(component.delimiter)
         return ComponentOutput(answer, transcript, params)
 
     ### functions that operate based on component_name in the template ###
 
-    def __run_component_no_params(self, component: ComponentAttributes) -> ComponentOutput:
+    def __run_component_no_params(self, component: ComponentAttributes, urls: List[str]) -> ComponentOutput:
         '''
         Maps component_name in template to its function in the class
         '''
         if component.component_name == 'title':
-            return self.get_title_component_result(component)
+            return self.get_title_component_result(component, urls)
         elif component.component_name == 'shortdescription':
-            return self.get_shortdescription_component_result(component)
+            return self.get_shortdescription_component_result(component, urls)
         elif component.component_name == 'bulletpoints':
-            return self.get_bulletpoint_component_result(component)
+            return self.get_bulletpoint_component_result(component, urls)
         elif component.component_name == 'title-fixed':
-            return self.get_title_fixed_component_result(component)
+            return self.get_title_fixed_component_result(component, urls)
 
     def __parse_param_address(self, param_address: str) -> List[int]:
         pattern = r"slide_(\d+)_body_(\d+)_(\d+)"
@@ -113,10 +136,8 @@ class HaystackTemplateProcessor:
 
     def __fill_params(self, template: dict, slide_num: int) -> dict:
         header_params = template['slides'][slide_num]['header'].params
-        print(f"filling params slide {slide_num} start")
         if len(header_params) > 0:
             params_parsed = self.__get_component_params_val(template, header_params)
-            print("header params parsed ", params_parsed)
             prompt = template['slides'][slide_num]['header'].prompt
             rag_query = template['slides'][slide_num]['header'].rag_query
             for param in params_parsed:
@@ -129,9 +150,7 @@ class HaystackTemplateProcessor:
 
         for (i, slide) in enumerate(template['slides'][slide_num]['body']):
             if len(slide.params) > 0:
-                print(f"slide {slide_num} body {i}")
                 params_parsed = self.__get_component_params_val(template, slide.params)
-                print("params parsed ", params_parsed)
                 prompt = template['slides'][slide_num]['body'][i].prompt
                 rag_query = template['slides'][slide_num]['body'][i].rag_query
                 for param in params_parsed:
@@ -142,15 +161,14 @@ class HaystackTemplateProcessor:
                 template['slides'][slide_num]['body'][i].rag_query = rag_query
                 template['slides'][slide_num]['body'][i].params = [{p['var']: p['val']} for p in params_parsed]
 
-        print("fill params done")
-
         return template
 
-    def get_template_result(self, template: dict) -> dict:
+    def get_template_result(self, template: dict, urls: List[str]) -> dict:
 
         for (i, slide) in enumerate(template['slides']):
+            print("in slide ", i)
             template = self.__fill_params(template, i)
-            header_output = self.__run_component_no_params(slide['header'])
+            header_output = self.__run_component_no_params(slide['header'], urls)
             template['slides'][i]['header'].output = {
                 "answer": header_output.answer,
                 "transcript": header_output.transcript,
@@ -158,7 +176,8 @@ class HaystackTemplateProcessor:
             }
 
             for (j, component) in enumerate(slide['body']):
-                component_output = self.__run_component_no_params(component)
+                print("in body component ", j)
+                component_output = self.__run_component_no_params(component, urls)
                 template['slides'][i]['body'][j].output = {
                     "answer": component_output.answer,
                     "transcript": component_output.transcript,
@@ -167,6 +186,6 @@ class HaystackTemplateProcessor:
 
         return template
 
-
-
-haystack_template_processor = HaystackTemplateProcessor()
+gpt4vision_template_processor = GPT4VisionTemplateProcessor(
+    openai_api_key=os.environ['OPENAI_API_KEY']
+)
