@@ -28,7 +28,8 @@ are simple JSON files with the following structure:
         "prompt": "<A specific prompt to add to the main prompt while creating this component output>",
         "params": ["<Array of parameters, each as a dictionary ex: {\"title\": \"slide_0_body_1_0\"}"],
         "rag_query": "<query passed to retrieval in RAG to find information>",
-        "delimiter": "<if the component is multi-result generator, indicates delimiter to split result>"
+        "delimiter": "<if the component is multi-result generator, indicates delimiter to split result>",
+        "output": "<this parameter is filled with the response and contains 'answer' and 'transcript'"
       },
       "body": [
         {
