@@ -6,7 +6,7 @@ from typing import List
 TEMP_PATH = 'mlops/tmp/'
 TEMP_PROCESSED_PATH = 'mlops/tmp_processed/'
 DELIMITER = '+++'
-WARNING_COMMAND = "Only write the answer."
+WARNING_COMMAND = "Only write the answer and write in a concise and direct form while retaining the essential meaning."
 
 @dataclass
 class ComponentAttributes:

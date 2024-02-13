@@ -13,17 +13,10 @@
       },
       "body": [
         {
-          "component_name": "shortdescription",
-          "prompt": "A short description less than 50 words explaining the whole idea of the context. The short description should highlight keywords and concepts mentioned in the context.",
+          "component_name": "bulletpoints",
+          "prompt": "Read the whole context and divide the whole knowledge explained in the context into exactly 5 chapters separated by \n and find a name less than 20 words for each chapter. Separate each chapter name by \n. Only write chapter names with \n. Make sure you find exactly 5 chapters.",
           "params": [],
           "rag_query": "important information",
-          "delimiter": ""
-        },
-        {
-          "component_name": "bulletpoints",
-          "prompt": "Read the whole context and divide the whole knowledge explained in the context into 5 chapters separated by \n and find a name less than 20 words for each chapter. Separate each chapter name by \n. Only write chapter names with \n.",
-          "params": [],
-          "rag_query": "Titles of the topics",
           "delimiter": "\n"
         }
       ]
@@ -32,7 +25,7 @@
       "header": {
         "component_name": "title-fixed",
         "prompt": "",
-        "params": [{"title": "slide_0_body_1_0"}],
+        "params": [{"title": "slide_0_body_0_0"}],
         "rag_query": "%title%",
         "delimiter": ""
       },
@@ -41,8 +34,15 @@
           "component_name": "shortdescription",
           "prompt": "You are writing a short description less than 50 words about the chapter '%chapter-name%'. First, find information related to the chapter and focus only on those. Second, find keywords and important information mentioned in the focused information about the chapter '%chapter-name%'. And finally, write a short description less than 50 words with all those keywords.",
           "rag_query": "%chapter-name%",
-          "params": [{"chapter-name": "slide_0_body_1_0"}],
+          "params": [{"chapter-name": "slide_0_body_0_0"}],
           "delimiter": ""
+        },
+        {
+          "component_name": "bulletpoints",
+          "prompt": "Read the whole context about %chapter-name% and divide the whole knowledge explained in the context into exactly 5 bullet points. Each bullet point should be less than 10 words and more than 6 words. Separate each bullet point by \n. Only write bullet points with \n.",
+          "params": [{"chapter-name": "slide_0_body_0_0"}],
+          "rag_query": "%chapter-name%",
+          "delimiter": "\n"
         }
       ]
     }

@@ -34,7 +34,6 @@ class GPT4VisionTemplateProcessor:
         :param component: any component
         :return: answer of the component
         '''
-        print("url in answer ", urls[0])
         content = [{
             "type": "image_url",
             "image_url": {
@@ -56,7 +55,6 @@ class GPT4VisionTemplateProcessor:
         :param max_words: maximum number of words in the speech
         :return: speech text
         '''
-        print("url in transcript ", urls[0])
 
         content = [{
             "type": "image_url",

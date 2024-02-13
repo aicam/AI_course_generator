@@ -188,6 +188,14 @@ as the model.
 
 ## GPT 4 vision
 
+GPT 4 vision is the latest ChatGPT model that can read images and understand every single 
+detail (both as a graph or figure). `POST mlops/query_gpt4_vision` 
+will parse the template and use ChatGPT 4 vision instead of RAG to
+generate slides and transcripts. In this scenario, after sending
+the PDF file to the endpoint, server split all pages and save them
+as JPEG files and create base64 encoding of them. These images will
+be appended to every request sent to the vision model. The following
+is a sample response from ChatGPT 4 vision.
 
 ```json
 {

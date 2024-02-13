@@ -44,7 +44,6 @@ def query_gpt4_vision(request: HttpRequest) -> JsonResponse:
                 "status": "error",
                 "result": err
             })
-        print(urls[0][:50])
         template = read_template("basic")
         result = gpt4vision_template_processor.get_template_result(template, urls)
         return JsonResponse({

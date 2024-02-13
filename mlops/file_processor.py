@@ -13,13 +13,11 @@ from .haystack_adopter import haystack_adopter
 
 class FileProcessor:
 
-    def __init__(self, s3_base_url: str, s3_directory: str):
+    def __init__(self):
         self.tmp_path = TEMP_PATH
         self.tmp_processed_path = TEMP_PROCESSED_PATH
         self.name_delimiter = DELIMITER
         self.index_name = "test"
-        self.s3_base_url = s3_base_url
-        self.s3_directory = s3_directory
 
     def pdf_to_txt(self, pdf_path, file_txt_path):
         with open(pdf_path, 'rb') as file:
@@ -84,14 +82,6 @@ class FileProcessor:
         shutil.rmtree(self.tmp_path, ignore_errors=True)
         shutil.rmtree(self.tmp_processed_path, ignore_errors=True)
 
-    def upload_file_s3(self, file_path: str, file_name: str):
-        s3_client = boto3.client('s3')
-        try:
-            s3_client.upload_file(file_path, os.environ["AWS_STORAGE_BUCKET_NAME"], self.s3_directory + file_name)
-        except Exception as e:
-            return e
-        return None
-
     def pdf2img(self, path):
         try:
             images = convert_from_path(path)
@@ -135,4 +125,4 @@ class FileProcessor:
             return image_urls, err
 
 
-file_processor = FileProcessor(os.environ['AWS_S3_BASE_URL'], os.environ['AWS_S3_BASE_DIRECTORY'])
+file_processor = FileProcessor()
